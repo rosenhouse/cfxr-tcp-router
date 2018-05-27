@@ -1,0 +1,9 @@
+[submodule "deploy/bosh-deployment"]
+	path = deploy/bosh-deployment
+	url = https://github.com/cloudfoundry/bosh-deployment
+[submodule "deploy/cf-deployment"]
+	path = deploy/cf-deployment
+	url = https://github.com/cloudfoundry/cf-deployment
+[submodule "deploy/kubo-deployment"]
+	path = deploy/kubo-deployment
+	url = https://github.com/cloudfoundry-incubator/kubo-deployment
