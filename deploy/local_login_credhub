@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+VBOX_IP="$(bosh int config/bosh_create_env_vars.yml --path /internal_ip)"
+
+credhub api --server "https://$VBOX_IP:8844/api" \
+  --ca-cert <(bosh int state/bosh-vars.yml --path /credhub_tls/ca) \
+  --ca-cert <(bosh int state/bosh-vars.yml --path /uaa_ssl/ca)
+
+admin_password="$(bosh int state/bosh-vars.yml --path /credhub_admin_client_secret)"
+credhub login --client-name credhub-admin --client-secret "$admin_password"

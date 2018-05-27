@@ -1,0 +1,22 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+source ./bosh_untarget
+
+<config/bosh_create_env_ops xargs \
+  bosh create-env bosh-deployment/bosh.yml \
+  --state state/bosh-state.json \
+  --vars-store state/bosh-vars.yml \
+  --vars-file config/bosh_create_env_vars.yml
+
+source ./bosh_target
+
+bosh -n update-cloud-config cf-deployment/iaas-support/bosh-lite/cloud-config.yml
+
+VBOX_IP="$(bosh int config/bosh_create_env_vars.yml --path /internal_ip)"
+# mac specific
+if ! (netstat -nr | grep 10.244); then
+  sudo route add -net "10.244.0.0/16" "$VBOX_IP"
+fi

@@ -1,0 +1,17 @@
+# this file only works if sourced
+
+this_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+state_dir=${this_dir}/state
+config_dir=${this_dir}/config
+
+BOSH_ENVIRONMENT="$(bosh int "$config_dir/bosh_create_env_vars.yml" --path /internal_ip)"
+BOSH_CLIENT="admin"
+BOSH_CLIENT_SECRET="$(bosh int "$state_dir/bosh-vars.yml" --path /admin_password)"
+BOSH_CA_CERT="$(bosh int "$state_dir/bosh-vars.yml" --path /director_ssl/ca)"
+
+export BOSH_CLIENT
+export BOSH_CLIENT_SECRET
+export BOSH_ENVIRONMENT
+export BOSH_CA_CERT
+
+bosh env

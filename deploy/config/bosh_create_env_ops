@@ -1,0 +1,7 @@
+-o bosh-deployment/virtualbox/cpi.yml
+-o bosh-deployment/virtualbox/outbound-network.yml
+-o bosh-deployment/bosh-lite.yml
+-o bosh-deployment/bosh-lite-runc.yml
+-o bosh-deployment/uaa.yml
+-o bosh-deployment/credhub.yml
+-o bosh-deployment/jumpbox-user.yml

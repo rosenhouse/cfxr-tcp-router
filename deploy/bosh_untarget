@@ -1,0 +1,6 @@
+# this file only works if sourced
+
+unset BOSH_CLIENT
+unset BOSH_CLIENT_SECRET
+unset BOSH_ENVIRONMENT
+unset BOSH_CA_CERT

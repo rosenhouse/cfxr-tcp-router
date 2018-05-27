@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+<config/bosh_create_env_ops xargs \
+  bosh delete-env bosh-deployment/bosh.yml \
+  --state state/bosh-state.json \
+  --vars-store state/bosh-vars.yml \
+  --vars-file config/bosh_create_env_vars.yml
+
+rm state/*.yml || rm state/*.json || true
