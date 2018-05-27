@@ -7,7 +7,10 @@ cd "$(dirname "$0")"
 source ./bosh_target
 
 STEMCELL_VERSION="$(bosh int cf-deployment/cf-deployment.yml --path=/stemcells/0/version)"
-bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-trusty-go_agent?v=${STEMCELL_VERSION}"
+if ! (bosh stemcells --column version | grep "$STEMCELL_VERSION"); then
+  echo "will upload stemcell $STEMCELL_VERSION"
+  bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-trusty-go_agent?v=${STEMCELL_VERSION}"
+fi
 
 <config/cf_deployment_ops xargs \
   bosh -n -d cf \

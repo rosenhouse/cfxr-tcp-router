@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+source ./bosh_target
+
+STEMCELL_VERSION="$(bosh int kubo-deployment/manifests/cfcr.yml --path=/stemcells/0/version)"
+if ! (bosh stemcells --column version | grep "$STEMCELL_VERSION"); then
+  echo "will upload stemcell $STEMCELL_VERSION"
+  bosh upload-stemcell "https://bosh.io/d/stemcells/bosh-warden-boshlite-ubuntu-trusty-go_agent?v=${STEMCELL_VERSION}"
+fi
+
+KUBO_VERSION="$(git -C kubo-deployment describe --exact-match --tags HEAD | tr -d v)"
+if ! (bosh releases | grep kubo | grep "$KUBO_VERSION"); then
+  echo "will upload kubo $KUBO_VERSION"
+  bosh upload-release \
+    https://bosh.io/d/github.com/cloudfoundry-incubator/kubo-release?v="$KUBO_VERSION"
+fi
+
+bosh -n -d cfcr deploy --no-redact kubo-deployment/manifests/cfcr.yml

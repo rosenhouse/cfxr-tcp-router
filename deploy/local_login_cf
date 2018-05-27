@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+./local_login_credhub
+
+director_name="$(bosh int config/bosh_create_env_vars.yml --path /director_name)"
+credhub_path="/$director_name/cf/cf_admin_password"
+cf_admin_password="$(bosh int <(credhub get -n "$credhub_path") --path /value)"
+
+cf api "api.bosh-lite.com" --skip-ssl-validation
+cf auth admin "$cf_admin_password"
