@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
+
+./local_login_credhub
+
+director_name="$(bosh int config/bosh_create_env_vars.yml --path /director_name)"
+admin_password=$(bosh int <(credhub get -n "${director_name}/cfcr/kubo-admin-password") --path=/value)
+
+# add this credhub-generated CA to your system keyring if you'd like to authenticate without --insecure-skip-tls-verify=true
+# tmp_ca_file="$(mktemp)"
+# bosh int <(credhub get -n "${director_name}/cfcr/tls-kubernetes") --path=/value/ca > "${tmp_ca_file}"
+
+kubernetes_master_host="$(bosh -d cfcr instances --json | jq -r '.Tables[0].Rows[] | select(.instance | startswith("master")) | .ips')"
+address="https://${kubernetes_master_host}:8443"
+cluster_name="kubo:${director_name}:cfcr"
+user_name="kubo:${director_name}:cfcr-admin"
+context_name="kubo:${director_name}:cfcr"
+
+kubectl config set-cluster "${cluster_name}" --server="${address}" --insecure-skip-tls-verify=true
+kubectl config set-credentials "${user_name}" --token="${admin_password}"
+kubectl config set-context "${context_name}" --cluster="${cluster_name}" --user="${user_name}"
+kubectl config use-context "${context_name}"
